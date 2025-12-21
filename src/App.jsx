@@ -45,7 +45,7 @@ const PublicLayout = () => {
 
 function App() {
     return (
-        <Router>
+        <Router basename="/lana-devportfolio">
             <div className="app-container">
                 <CustomCursor />
                 <Routes>
