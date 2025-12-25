@@ -56,7 +56,7 @@ const Contact = () => {
     }
 
     return (
-        <footer className="section" style={{ background: 'var(--bg-primary)', position: 'relative', overflow: 'hidden' }}>
+        <footer className="section" style={{ background: 'var(--bg-primary)', position: 'relative', overflow: 'hidden', paddingBottom: '30px' }}>
             <div style={{
                 position: 'absolute',
                 bottom: '-20%',
@@ -75,7 +75,7 @@ const Contact = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     className="contact-grid"
-                    style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '60px', marginBottom: '80px' }}
+                    style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '60px', marginBottom: '40px' }}
                 >
                     <div className="contact-info">
                         <h2 style={{ fontSize: '2.5rem', marginBottom: '20px' }}>Let's <span className="text-gradient">Talk</span></h2>
@@ -142,7 +142,7 @@ const Contact = () => {
                 borderTop: '1px solid rgba(255,255,255,0.05)',
                 color: 'var(--text-secondary)',
                 fontSize: '0.9rem',
-                marginTop: '40px',
+                marginTop: '20px',
                 position: 'relative',
                 zIndex: 1
             }}>

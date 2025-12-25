@@ -1,21 +1,26 @@
 
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaGithub, FaExternalLinkAlt } from 'react-icons/fa'
+import { FaGithub, FaExternalLinkAlt, FaYoutube } from 'react-icons/fa'
 import { supabase } from '../lib/supabaseClient'
 
 const Projects = () => {
     const [filter, setFilter] = useState('All')
+    const [visibleCount, setVisibleCount] = useState(6)
     const [projects, setProjects] = useState([
-        { id: 1, title: 'E-Commerce Platform', category: 'Web', image_url: 'https://via.placeholder.com/600x400?text=E-Commerce', stack: ['React', 'Node.js', 'Supabase'] },
-        { id: 2, title: 'Fitness Tracker App', category: 'Mobile', image_url: 'https://via.placeholder.com/600x400?text=Mobile+App', stack: ['Flutter', 'Firebase'] },
-        { id: 3, title: 'Modern Portfolio Design', category: 'Design', image_url: 'https://via.placeholder.com/600x400?text=UI+Design', stack: ['Figma', 'Adobe XD'] },
+        { id: 1, title: 'E-Commerce Platform', category: 'Web', image_url: 'https://via.placeholder.com/600x400?text=E-Commerce', stack: ['React', 'Node.js', 'Supabase'], is_pinned: true },
+        { id: 2, title: 'Fitness Tracker App', category: 'Mobile', image_url: 'https://via.placeholder.com/600x400?text=Mobile+App', stack: ['Flutter', 'Firebase'], is_pinned: false },
+        { id: 3, title: 'Modern Portfolio Design', category: 'Design', image_url: 'https://via.placeholder.com/600x400?text=UI+Design', stack: ['Figma', 'Adobe XD'], is_pinned: false },
     ])
 
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const { data, error } = await supabase.from('projects').select('*').order('order', { ascending: true })
+                const { data, error } = await supabase
+                    .from('projects')
+                    .select('*')
+                    .order('is_pinned', { ascending: false })
+                    .order('order', { ascending: true })
                 if (error) console.error('Error fetching projects:', error)
                 if (data && data.length > 0) {
                     setProjects(data)
@@ -27,7 +32,20 @@ const Projects = () => {
         fetchProjects()
     }, [])
 
-    const filteredProjects = filter === 'All' ? projects : projects.filter(p => p.category === filter)
+    const filteredProjects = filter === 'All'
+        ? projects
+        : projects.filter(p => p.category === filter)
+
+    const displayedProjects = filteredProjects.slice(0, visibleCount)
+
+    const handleLoadMore = () => {
+        setVisibleCount(prev => prev + 6)
+    }
+
+    // Reset visible count when filter changes
+    useEffect(() => {
+        setVisibleCount(6)
+    }, [filter])
     const categories = ['All', 'Web', 'Mobile', 'Design']
 
     return (
@@ -61,7 +79,7 @@ const Projects = () => {
 
                 <motion.div layout style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '30px' }}>
                     <AnimatePresence mode='popLayout'>
-                        {filteredProjects.map(project => (
+                        {displayedProjects.map(project => (
                             <motion.div
                                 layout
                                 key={project.id}
@@ -91,6 +109,11 @@ const Projects = () => {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                                         <span style={{ fontSize: '0.8rem', color: 'var(--accent-secondary)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>{project.category}</span>
                                         <div style={{ display: 'flex', gap: '10px' }}>
+                                            {project.youtube_url && (
+                                                <a href={project.youtube_url} target="_blank" rel="noopener noreferrer">
+                                                    <FaYoutube style={{ color: '#ff0000', fontSize: '1.2rem', cursor: 'pointer' }} />
+                                                </a>
+                                            )}
                                             {project.repo_url && (
                                                 <a href={project.repo_url} target="_blank" rel="noopener noreferrer">
                                                     <FaGithub style={{ color: 'var(--text-secondary)', cursor: 'none' }} />
@@ -122,6 +145,28 @@ const Projects = () => {
                         ))}
                     </AnimatePresence>
                 </motion.div>
+
+                {filteredProjects.length > visibleCount && (
+                    <div style={{ textAlign: 'center', marginTop: '40px' }}>
+                        <button
+                            onClick={handleLoadMore}
+                            style={{
+                                padding: '12px 30px',
+                                background: 'var(--accent-primary)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '25px',
+                                fontSize: '1rem',
+                                cursor: 'pointer',
+                                transition: 'transform 0.3s'
+                            }}
+                            onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
+                            onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                        >
+                            Load More
+                        </button>
+                    </div>
+                )}
             </div>
         </section>
     )

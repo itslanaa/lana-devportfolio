@@ -6,7 +6,7 @@ import { FaTrash, FaEdit, FaPlus } from 'react-icons/fa'
 const ProjectManager = () => {
     const [projects, setProjects] = useState([])
     const [editingProject, setEditingProject] = useState(null) // null = list mode, {} = create mode, {id...} = edit mode
-    const [formData, setFormData] = useState({ title: '', category: 'Web', image_url: '', stack: '', demo_url: '', repo_url: '' })
+    const [formData, setFormData] = useState({ title: '', category: 'Web', image_url: '', stack: '', demo_url: '', repo_url: '', youtube_url: '', is_pinned: false })
 
     useEffect(() => {
         fetchProjects()
@@ -33,7 +33,7 @@ const ProjectManager = () => {
 
     const handleCreate = () => {
         setEditingProject({})
-        setFormData({ title: '', category: 'Web', image_url: '', stack: '', demo_url: '', repo_url: '' })
+        setFormData({ title: '', category: 'Web', image_url: '', stack: '', demo_url: '', repo_url: '', youtube_url: '', is_pinned: false })
     }
 
     const handleSubmit = async (e) => {
@@ -73,6 +73,17 @@ const ProjectManager = () => {
                         </div>
                     </div>
                     <div style={{ marginBottom: '20px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                            <input
+                                type="checkbox"
+                                checked={formData.is_pinned}
+                                onChange={e => setFormData({ ...formData, is_pinned: e.target.checked })}
+                                style={{ width: '20px', height: '20px' }}
+                            />
+                            Pin Project (Show first)
+                        </label>
+                    </div>
+                    <div style={{ marginBottom: '20px' }}>
                         <label>Image URL</label>
                         <input type="text" value={formData.image_url} onChange={e => setFormData({ ...formData, image_url: e.target.value })} className="form-input" style={inputStyle} />
                     </div>
@@ -88,6 +99,10 @@ const ProjectManager = () => {
                         <div style={{ marginBottom: '20px' }}>
                             <label>Repo URL</label>
                             <input type="text" value={formData.repo_url} onChange={e => setFormData({ ...formData, repo_url: e.target.value })} className="form-input" style={inputStyle} />
+                        </div>
+                        <div style={{ marginBottom: '20px' }}>
+                            <label>YouTube URL</label>
+                            <input type="text" value={formData.youtube_url} onChange={e => setFormData({ ...formData, youtube_url: e.target.value })} className="form-input" style={inputStyle} placeholder="Optional" />
                         </div>
                     </div>
                     <button type="submit" className="btn-primary">Save Project</button>
@@ -111,7 +126,10 @@ const ProjectManager = () => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                             <img src={project.image_url || 'https://via.placeholder.com/50'} alt="" style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '5px' }} />
                             <div>
-                                <h4 style={{ fontSize: '1.1rem' }}>{project.title}</h4>
+                                <h4 style={{ fontSize: '1.1rem' }}>
+                                    {project.title}
+                                    {project.is_pinned && <span style={{ marginLeft: '10px', fontSize: '0.8rem', background: 'var(--accent-primary)', padding: '2px 8px', borderRadius: '4px', color: 'white' }}>Pinned</span>}
+                                </h4>
                                 <span style={{ fontSize: '0.8rem', color: 'var(--accent-secondary)' }}>{project.category}</span>
                             </div>
                         </div>

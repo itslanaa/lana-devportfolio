@@ -6,10 +6,10 @@ import { supabase } from '../lib/supabaseClient'
 
 const Hero = () => {
     const [content, setContent] = useState({
-        greeting: "Hello, I'm",
-        name: "John Doe",
-        title: "Software Developer",
-        description: "I build accessible, pixel-perfect, and performant web experiences. Passionate about creating digital solutions that help businesses grow."
+        greeting: "",
+        name: "",
+        title: "",
+        description: ""
     })
 
     // Typewriter effect state

@@ -15,11 +15,20 @@ import ServicesManager from '../components/admin/ServicesManager'
 
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('hero')
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const navigate = useNavigate()
 
     const handleLogout = async () => {
         await supabase.auth.signOut()
         navigate('/login')
+    }
+
+    // Auto-close sidebar on mobile when navigating
+    const handleTabChange = (tab) => {
+        setActiveTab(tab)
+        if (window.innerWidth < 768) {
+            setIsSidebarOpen(false)
+        }
     }
 
     const renderContent = () => {
@@ -37,32 +46,81 @@ const AdminDashboard = () => {
     }
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
+        <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)', position: 'relative' }}>
+            {/* Mobile Hamburger Button */}
+            <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                style={{
+                    display: 'none', // Hidden on desktop by CSS media query below
+                    position: 'fixed',
+                    top: '20px',
+                    left: '20px',
+                    zIndex: 1001,
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '5px',
+                    padding: '10px',
+                    color: 'white',
+                    fontSize: '1.2rem',
+                    cursor: 'pointer'
+                }}
+                className="mobile-menu-btn"
+            >
+                <FaBars />
+            </button>
+
+            {/* Overlay for Mobile */}
+            {isSidebarOpen && (
+                <div
+                    onClick={() => setIsSidebarOpen(false)}
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        background: 'rgba(0,0,0,0.5)',
+                        zIndex: 999,
+                        backdropFilter: 'blur(3px)'
+                    }}
+                    className="mobile-overlay"
+                />
+            )}
+
             {/* Sidebar */}
-            <div style={{
-                width: '280px',
-                background: 'var(--bg-secondary)',
-                borderRight: '1px solid rgba(255,255,255,0.05)',
-                padding: '20px',
-                display: 'flex',
-                flexDirection: 'column'
-            }}>
+            <div
+                className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}
+                style={{
+                    width: '280px',
+                    background: 'var(--bg-secondary)',
+                    borderRight: '1px solid rgba(255,255,255,0.05)',
+                    padding: '20px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    // Responsive styles handled by CSS or inline logic below
+                    height: '100vh',
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1000,
+                    overflowY: 'auto'
+                }}
+            >
                 <h2 style={{ marginBottom: '30px', fontSize: '1.2rem', paddingLeft: '10px' }}>Admin <span className="text-gradient">Panel</span></h2>
 
                 <div style={{ flex: 1, overflowY: 'auto' }}>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', paddingLeft: '10px', marginBottom: '10px', textTransform: 'uppercase' }}>Content</p>
-                    <SidebarButton active={activeTab === 'hero'} onClick={() => setActiveTab('hero')} icon={<FaUserEdit />} label="Hero Section" />
-                    <SidebarButton active={activeTab === 'about'} onClick={() => setActiveTab('about')} icon={<FaUserEdit />} label="About Me" />
-                    <SidebarButton active={activeTab === 'services'} onClick={() => setActiveTab('services')} icon={<FaTools />} label="Services" />
-                    <SidebarButton active={activeTab === 'projects'} onClick={() => setActiveTab('projects')} icon={<FaProjectDiagram />} label="Projects" />
-                    <SidebarButton active={activeTab === 'testimonials'} onClick={() => setActiveTab('testimonials')} icon={<FaStar />} label="Testimonials" />
+                    <SidebarButton active={activeTab === 'hero'} onClick={() => handleTabChange('hero')} icon={<FaUserEdit />} label="Hero Section" />
+                    <SidebarButton active={activeTab === 'about'} onClick={() => handleTabChange('about')} icon={<FaUserEdit />} label="About Me" />
+                    <SidebarButton active={activeTab === 'services'} onClick={() => handleTabChange('services')} icon={<FaTools />} label="Services" />
+                    <SidebarButton active={activeTab === 'projects'} onClick={() => handleTabChange('projects')} icon={<FaProjectDiagram />} label="Projects" />
+                    <SidebarButton active={activeTab === 'testimonials'} onClick={() => handleTabChange('testimonials')} icon={<FaStar />} label="Testimonials" />
 
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', paddingLeft: '10px', marginTop: '20px', marginBottom: '10px', textTransform: 'uppercase' }}>Settings</p>
-                    <SidebarButton active={activeTab === 'navigation'} onClick={() => setActiveTab('navigation')} icon={<FaBars />} label="Navigation (DnD)" />
-                    <SidebarButton active={activeTab === 'contact'} onClick={() => setActiveTab('contact')} icon={<FaCogs />} label="Contact Info" />
+                    <SidebarButton active={activeTab === 'navigation'} onClick={() => handleTabChange('navigation')} icon={<FaBars />} label="Navigation (DnD)" />
+                    <SidebarButton active={activeTab === 'contact'} onClick={() => handleTabChange('contact')} icon={<FaCogs />} label="Contact Info" />
 
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', paddingLeft: '10px', marginTop: '20px', marginBottom: '10px', textTransform: 'uppercase' }}>Inquiries</p>
-                    <SidebarButton active={activeTab === 'messages'} onClick={() => setActiveTab('messages')} icon={<FaEnvelope />} label="Messages" />
+                    <SidebarButton active={activeTab === 'messages'} onClick={() => handleTabChange('messages')} icon={<FaEnvelope />} label="Messages" />
                 </div>
 
                 <button onClick={handleLogout} style={{ ...navButtonStyle, color: '#ef4444', marginTop: '20px' }}>
@@ -71,7 +129,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* Main Content */}
-            <div style={{ flex: 1, padding: '40px', overflowY: 'auto', height: '100vh' }}>
+            <div style={{ flex: 1, padding: '40px', overflowY: 'auto', height: '100vh', width: '100%' }}>
                 <motion.div
                     key={activeTab}
                     initial={{ opacity: 0, x: 20 }}
@@ -81,6 +139,29 @@ const AdminDashboard = () => {
                     {renderContent()}
                 </motion.div>
             </div>
+
+            <style jsx>{`
+                @media (max-width: 768px) {
+                    .mobile-menu-btn {
+                        display: block !important;
+                    }
+                    .admin-sidebar {
+                        position: fixed !important;
+                        top: 0;
+                        left: 0;
+                        transform: translateX(-100%);
+                        transition: transform 0.3s ease-in-out;
+                        height: 100vh;
+                        box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+                    }
+                    .admin-sidebar.open {
+                        transform: translateX(0);
+                    }
+                    .mobile-overlay {
+                        display: block;
+                    }
+                }
+            `}</style>
         </div>
     )
 }
